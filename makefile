@@ -1,13 +1,5 @@
-lsts = lst.h lst.c
-ofs = of.h of.c
-slibs = $(lsts) $(ofs)
-objfs = lst.o of.o
+rpnc: of.o main.c
+	gcc -o rpnc of.o main.c
 
-rpnc: lst.o main.c
-	gcc -o rpnc $(objfs) main.c
-
-objs: $(slibs)
-	gcc -include stddef.h -c $(lsts)
-	gcc -c $(ofs)
-
-
+of: of.h of.c
+	gcc -c of.h of.c
