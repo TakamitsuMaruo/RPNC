@@ -2,9 +2,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stddef.h>
-#include "lst.h"
 #include "of.h"
 
+typedef enum {
+	NORMAL,
+	THEN,
+	ELSE,
+} mode;
 
 int main( int argc, char *argv[] ) {
 	if ( argc != 2 ) {
@@ -12,113 +16,125 @@ int main( int argc, char *argv[] ) {
 		return 255;
 	}
 	char *p = argv[1];
-	char *pat = "+-*/%<>?=!", *chr;
-	long c;
+	char *pat = "+-*/%<>?:;=!", *chr;
+	mode m;
+	long c, hw = 0;
       	printf( ".intel_syntax noprefix\n" );
 	printf( ".globl main\n" );
 	printf( "main:\n" );
-	for ( p; *p; p++ ) {
-		if ( ( ( *p == '+' || *p == '-' ) && ( '0' <= *(p+1) && *(p+1) <= '9' ) ) || ( '0' <= *p && *p <= '9'  ) ) {
+	for ( p ; *p ; p++ ) {
+		if ( ( ( *p == '+' || *p == '-' ) && ( '0' <= *(p+1) && *(p+1) <= '9' ) ) || ( '0' <= *p && *p <= '9' ) ) {
 			c = strtol( p, &p, 10 );
-			putasm( "PUSH %ld", c );
+			putasm( "push %ld", c );
 		} else if ( ( chr = strchr( pat, *p ) ) != NULL ) { 
 			switch ( chr - pat ) {
 			case 0:
-				putasm( "POP RAX" );
-				putasm( "POP RBX" );
-				putasm( "ADD RAX, RBX" );
-				putasm( "PUSH RAX" );
+				putasm( "pop rax" );
+				putasm( "pop rbx" );
+				putasm( "add rax, rbx" );
+				putasm( "push rax" );
 				break;
 			case 1:
-				putasm( "POP RAX" );	
-				putasm( "POP RBX" );
-				putasm( "SUB RAX, RBX" );
-				putasm( "PUSH RAX" );
+				putasm( "pop rax" );	
+				putasm( "pop rbx" );
+				putasm( "sub rax, rbx" );
+				putasm( "push rax" );
 				break;
 			case 2:
-				putasm( "POP RAX" );
-				putasm( "POP RDX" );
-				putasm( "IMUL RDX" );
-				putasm( "PUSH RAX" );
+				putasm( "pop rax" );
+				putasm( "pop rdx" );
+				putasm( "imul rdx" );
+				putasm( "push rax" );
 				break;
 			case 3:
-				putasm( "CQO" );
-				putasm( "POP RAX" );
-				putasm( "POP RBX" );
-				putasm( "IDIV RBX" );
-				putasm( "PUSH RAX" );
+				putasm( "cqo" );
+				putasm( "pop rax" );
+				putasm( "pop rbx" );
+				putasm( "idiv rbx" );
+				putasm( "push rax" );
 				break;
 			case 4: // '%'
-				putasm( "CQO" );	
-				putasm( "POP RAX" );
-				putasm( "POP RBX" );
-				putasm( "IDIV RBX" );
-				putasm( "PUSH RDX" );
+				putasm( "cqo" );	
+				putasm( "pop rax" );
+				putasm( "pop rbx" );
+				putasm( "idiv rbx" );
+				putasm( "push rdx" );
 				break;
 			case 5: // '<'
-				putasm( "POP RAX" );
-				putasm( "POP RDI" );
-				putasm( "CMP RAX, RDI" );
-				putasm( "SETL AL" );
-				putasm( "MOVZB RAX, AL" );
-				putasm( "PUSH RAX" );
+				putasm( "pop rax" );
+				putasm( "pop rdi" );
+				putasm( "cmp rax, rdi" );
+				putasm( "setl al" );
+				putasm( "movzb rax, al" );
+				putasm( "push rax" );
 				break;
 			case 6: // '>'
-				putasm( "POP RDI" );
-				putasm( "POP RAX" );
-				putasm( "CMP RAX, RDI" );
-				putasm( "SETL AL" );
-				putasm( "MOVZB RAX, AL" );
-				putasm( "PUSH RAX" );
+				putasm( "pop rdi" );
+				putasm( "pop rax" );
+				putasm( "cmp rax, rdi" );
+				putasm( "setl al" );
+				putasm( "movzb rax, al" );
+				putasm( "push rax" );
 				break;
 			case 7:
+				hw += 1;
+				putasm( "pop rax" );
+				putasm( "cmp rax, 0" );
+				putasm( "je .E%ld", hw );		
 				break;
 			case 8:
+				putasm( "jmp .T%ld", hw );
+				printf( ".E%ld:\n", hw );
+				break;
+			case 9:
+				printf( ".T%ld:\n", hw );
+				break;
+			case 10:
 				switch ( *(p+1) ) {
 				case '=':			
-					putasm( "POP RAX" );
-					putasm( "POP RDI" );
-					putasm( "CMP RAX, RDI" );
-					putasm( "SETE AL" );
-					putasm( "MOVZB RAX, AL" );
-					putasm( "PUSH RAX" );
+					putasm( "pop rax" );
+					putasm( "pop rdi" );
+					putasm( "cmp rax, rdi" );
+					putasm( "sete al" );
+					putasm( "movzb rax, al" );
+					putasm( "push rax" );
 					break;
 				case '<':
-					putasm( "POP RAX" );
-					putasm( "POP RDI" );
-					putasm( "CMP RAX, RDI" );
-					putasm( "SETLE AL" );
-					putasm( "MOVZB RAX, AL" );
-					putasm( "PUSH RAX" );
+					putasm( "pop rax" );
+					putasm( "pop rdi" );
+					putasm( "cmp rax, rdi" );
+					putasm( "setle al" );
+					putasm( "movzb rax, al" );
+					putasm( "push rax" );
 					break;
 				case '>':
-					putasm( "POP RDI" );
-					putasm( "POP RAX" );
-					putasm( "CMP RAX, RDI" );
-					putasm( "SETL AL" );
-					putasm( "MOVZB RAX, AL" );
-					putasm( "PUSH RAX" );
+					putasm( "pop rdi" );
+					putasm( "pop rax" );
+					putasm( "cmp rax, rdi" );
+					putasm( "setl al" );
+					putasm( "movzb rax, al" );
+					putasm( "push rax" );
 					break;
 				}
 				break;
-			case 9:
+			case 11:
 				if ( *(p+1) == ' ' || *(p+1) == '\0' || *(p+1) == '\n' ) {
-					putasm( "POP RAX" );
-					putasm( "NOT RAX" );
-					putasm( "PUSH RAX" );
+					putasm( "pop rax" );
+					putasm( "not rax" );
+					putasm( "push rax" );
 				} else if ( *(p+1) == '=' ) {
-					putasm( "POP RAX" );
-					putasm( "POP RDI" );
-					putasm( "CMP RAX, RDI" );
-					putasm( "SETNE AL" );
-					putasm( "MOVZB RAX, AL" );
-					putasm( "PUSH RAX" );
+					putasm( "pop rax" );
+					putasm( "pop rdi" );
+					putasm( "cmp rax, rdi" );
+					putasm( "setne al" );
+					putasm( "movzb rax, al" );
+					putasm( "push rax" );
 				}	
 				break;
 			}
 		}
 	}
-	putasm( "POP RAX" );
-	putasm( "RET" );
+	putasm( "pop rax" );
+	putasm( "ret" );
 	return 0;
 }
