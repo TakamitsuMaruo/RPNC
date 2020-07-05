@@ -22,4 +22,5 @@ Note:
 
 TODO:
   Loop実装
+  String実装
   Standard I/O実装
