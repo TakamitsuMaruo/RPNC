@@ -16,3 +16,6 @@ license : MIT
 のあと  
 `$ cc -o <assembly file> <assembly file>.s`  
 でどうぞ  
+
+Note:  
+  各トークンの間に1つ以上のスペースを入れてください.
