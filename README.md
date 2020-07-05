@@ -19,3 +19,7 @@ license : MIT
 
 Note:  
   各トークンの間に1つ以上のスペースを入れてください.
+
+TODO:
+  Loop実装
+  Standard I/O実装
