@@ -1,13 +1,13 @@
-lsts = lst.h lst.c
 ofs = of.h of.c
-slibs = $(lsts) $(ofs)
-objfs = lst.o of.o
+objfs = of.o
 
-rpnc: lst.o main.c
-	gcc -o rpnc $(objfs) main.c
+debug: $(ofs) main.c
+	gcc $(objfs) -g -O0 -o rpnc main.c
 
-objs: $(slibs)
-	gcc -include stddef.h -c $(lsts)
+release: $(ofs) main.c
+	gcc $(objfs)    -O2 -o rpnc main.c
+
+of: $(ofs)
 	gcc -c $(ofs)
 
 
