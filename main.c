@@ -22,70 +22,89 @@ int main( int argc, char *argv[] ) {
 			putasm( "push %ld", c );
 		} else if ( ( chr = strchr( pat, *p ) ) != NULL ) { 
 			switch ( chr - pat ) {
-			case 0:
+			case 0:  // '+'
 				putasm( "pop rax" );
 				putasm( "pop rbx" );
 				putasm( "add rax, rbx" );
 				putasm( "push rax" );
 				break;
-			case 1:
+			case 1:  // '-'
 				putasm( "pop rax" );	
 				putasm( "pop rbx" );
 				putasm( "sub rax, rbx" );
 				putasm( "push rax" );
 				break;
-			case 2:
+			case 2:  // '*'
 				putasm( "pop rax" );
 				putasm( "pop rdx" );
 				putasm( "imul rdx" );
 				putasm( "push rax" );
 				break;
-			case 3:
+			case 3:  // '/'
 				putasm( "cqo" );
 				putasm( "pop rax" );
 				putasm( "pop rbx" );
 				putasm( "idiv rbx" );
 				putasm( "push rax" );
 				break;
-			case 4: // '%'
+			case 4:  // '%'
 				putasm( "cqo" );	
 				putasm( "pop rax" );
 				putasm( "pop rbx" );
 				putasm( "idiv rbx" );
 				putasm( "push rdx" );
 				break;
-			case 5: // '<'
-				putasm( "pop rax" );
-				putasm( "pop rdi" );
-				putasm( "cmp rax, rdi" );
-				putasm( "setl al" );
-				putasm( "movzb rax, al" );
-				putasm( "push rax" );
+			case 5:  // '<'
+				if ( *(p+1) == ' ' || *(p+1) == '\n' || *(p+1) == '\0' ) {
+					putasm( "pop rax" );
+					putasm( "pop rdi" );
+					putasm( "cmp rax, rdi" );
+					putasm( "setl al" );
+					putasm( "movzb rax, al" );
+					putasm( "push rax" );	
+				} else if ( *(p+1) == '=' ) {		
+					putasm( "pop rax" );
+					putasm( "pop rdi" );
+					putasm( "cmp rax, rdi" );
+					putasm( "setle al" );
+					putasm( "movzb rax, al" );
+					putasm( "push rax" );
+				}
 				break;
-			case 6: // '>'
-				putasm( "pop rdi" );
-				putasm( "pop rax" );
-				putasm( "cmp rax, rdi" );
-				putasm( "setl al" );
-				putasm( "movzb rax, al" );
-				putasm( "push rax" );
+			case 6:  // '>'	
+				if ( *(p+1) == ' ' || *(p+1) == '\n' || *(p+1) == '\0' ) {
+					putasm( "pop rdi" );
+					putasm( "pop rax" );
+					putasm( "cmp rax, rdi" );
+					putasm( "setg al" );
+					putasm( "movzb rax, al" );
+					putasm( "push rax" );
+				} else if ( *(p+1) == '=' ) {		
+					putasm( "pop rdi" );
+					putasm( "pop rax" );
+					putasm( "cmp rax, rdi" );
+					putasm( "setge al" );
+					putasm( "movzb rax, al" );
+					putasm( "push rax" );
+					break;
+				}
 				break;
-			case 7:
+			case 7:  // '?'
 				hw += 1;
 				putasm( "pop rax" );
 				putasm( "cmp rax, 0" );
 				putasm( "je .E%ld", hw );		
 				break;
-			case 8:
+			case 8:  // ':'
 				putasm( "jmp .T%ld", hw );
 				printf( ".E%ld:\n", hw );
 				break;
-			case 9:
+			case 9:  // ';'
 				printf( ".T%ld:\n", hw );
 				break;
-			case 10:
+			case 10: 
 				switch ( *(p+1) ) {
-				case '=':			
+				case '=': // "=="			
 					putasm( "pop rax" );
 					putasm( "pop rdi" );
 					putasm( "cmp rax, rdi" );
@@ -93,21 +112,7 @@ int main( int argc, char *argv[] ) {
 					putasm( "movzb rax, al" );
 					putasm( "push rax" );
 					break;
-				case '<':
-					putasm( "pop rax" );
-					putasm( "pop rdi" );
-					putasm( "cmp rax, rdi" );
-					putasm( "setle al" );
-					putasm( "movzb rax, al" );
-					putasm( "push rax" );
-					break;
-				case '>':
-					putasm( "pop rdi" );
-					putasm( "pop rax" );
-					putasm( "cmp rax, rdi" );
-					putasm( "setl al" );
-					putasm( "movzb rax, al" );
-					putasm( "push rax" );
+				case ' ':
 					break;
 				}
 				break;
