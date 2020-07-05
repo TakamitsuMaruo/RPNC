@@ -8,9 +8,11 @@ main.c : コンパイラ本体です.ここでコンパイルの9割をやって
 makefile : 適当に書いたのでビルドに使えないかもしれない.
 license : MIT  
 
+# Make
+`$ make release`  
+
 # Usage  
-makeして  
-`$ ./rpnc <expression> > <assembly file>.s`
-のあと
-`$ cc -o <assembly file> <assembly file>.s`
+`$ ./rpnc <expression> > <assembly file>.s`  
+のあと  
+`$ cc -o <assembly file> <assembly file>.s`  
 でどうぞ  
