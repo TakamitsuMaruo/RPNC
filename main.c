@@ -4,11 +4,6 @@
 #include <stddef.h>
 #include "of.h"
 
-typedef enum {
-	NORMAL,
-	THEN,
-	ELSE,
-} mode;
 
 int main( int argc, char *argv[] ) {
 	if ( argc != 2 ) {
@@ -17,7 +12,6 @@ int main( int argc, char *argv[] ) {
 	}
 	char *p = argv[1];
 	char *pat = "+-*/%<>?:;=!", *chr;
-	mode m;
 	long c, hw = 0;
       	printf( ".intel_syntax noprefix\n" );
 	printf( ".globl main\n" );
